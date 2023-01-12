@@ -65,8 +65,10 @@ int Discretization::getNumOfSpheres()
 
 void Discretization::createPosesOnSphere(const geometry_msgs::Point &center, const double r, std::vector<geometry_msgs::Pose> &poses)
 {
-  const double DELTA = M_PI/5.;
-  const unsigned MAX_INDEX  (2 * 5 *5);
+//  const double DELTA = M_PI/5.;
+//  const unsigned MAX_INDEX  (2 * 5 *5);
+  const double DELTA = M_PI/3.;
+  const unsigned MAX_INDEX  (1 * 3);
   static std::vector<geometry_msgs::Point> position_vector(MAX_INDEX);
   static std::vector<tf::Quaternion> quaternion(MAX_INDEX);
   static bool initialized = false;
@@ -74,19 +76,21 @@ void Discretization::createPosesOnSphere(const geometry_msgs::Point &center, con
   {
     initialized = true;
     unsigned index = 0;
-    for(double phi = 0; phi<2*M_PI; phi+=DELTA)//Azimuth[0,2PI]
+    for (double phi = -DELTA; phi <= DELTA; phi+=DELTA) //Azimuth[-45,45]
+//    for(double phi = 0; phi<2*M_PI; phi+=DELTA)//Azimuth[0,2PI]
     {
-      for(double theta = 0;theta<M_PI;theta +=DELTA) //Elevation[0,2PI]
-      {
-        position_vector[index].x = cos(phi)*sin(theta);
-        position_vector[index].y = sin(phi)*sin(theta);
-        position_vector[index].z = cos(theta);
+//      for(double theta = 0;theta<M_PI;theta +=DELTA) //Elevation[0,2PI]
+//      {
+//        position_vector[index].x = cos(phi)*sin(theta);
+//        position_vector[index].y = sin(phi)*sin(theta);
+//        position_vector[index].z = cos(theta);
         tf::Quaternion quat;
-        quat.setRPY(0, ((M_PI/2)+theta), phi);
+//        quat.setRPY(0, ((M_PI/2)+theta), phi);
+        quat.setRPY(0, M_PI/2, phi);
         quat.normalize();
         quaternion[index] = quat;
         index++;
-      }
+//      }
     }
   }
   poses.reserve(MAX_INDEX);
@@ -94,9 +98,12 @@ void Discretization::createPosesOnSphere(const geometry_msgs::Point &center, con
   geometry_msgs::Pose pose;
   for(int i=0;i<MAX_INDEX;++i)
   {
-    pose.position.x = r * position_vector[i].x + center.x;
-    pose.position.y = r * position_vector[i].y + center.y;
-    pose.position.z = r * position_vector[i].z + center.z;
+    pose.position.x = center.x;
+    pose.position.y = center.y;
+    pose.position.z = center.z;
+//    pose.position.x = r * position_vector[i].x + center.x;
+//    pose.position.y = r * position_vector[i].y + center.y;
+//    pose.position.z = r * position_vector[i].z + center.z;
     pose.orientation.x = quaternion[i].x();
     pose.orientation.y = quaternion[i].y();
     pose.orientation.z = quaternion[i].z();
@@ -107,7 +114,7 @@ void Discretization::createPosesOnSphere(const geometry_msgs::Point &center, con
 
 void Discretization::createPoses(const std::vector<geometry_msgs::Point> &centers, std::vector<geometry_msgs::Pose> &poses)
 {
-  poses.reserve(centers.size()*50);
+  poses.reserve(centers.size()*3);//50);
   for(int i=0;i<centers.size();++i)
   {
     map_generation::WsSphere wsSphere;

@@ -53,6 +53,9 @@ add_library(utility src/${PROJECT_NAME}/utility.cpp)
 add_library(reachability  src/${PROJECT_NAME}/reachability.cpp)
 add_library(map_generation  src/${PROJECT_NAME}/map_generation.cpp)
 
+add_dependencies(discretization map_generation_generate_messages_cpp)
+add_dependencies(utility map_generation_generate_messages_cpp)
+
 target_link_libraries(discretization  ${catkin_LIBRARIES} ${OCTOMAP_LIBRARIES})
 target_link_libraries(utility  ${catkin_LIBRARIES})
 target_link_libraries(reachability  ${catkin_LIBRARIES} utility)
@@ -68,7 +71,6 @@ install(TARGETS discretization dataset utility reachability map_generation
 install(DIRECTORY include/${PROJECT_NAME}/
  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
-
 
 
 add_executable(map_generation_node src/nodes/map_generation_node.cpp)

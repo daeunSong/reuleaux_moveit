@@ -159,15 +159,26 @@ ReachAbility::ReachAbility(ros::NodeHandle& node, std::string group_name, bool c
      ROS_INFO("Processing sphere: %d / %d", i+1,sp_size);
      std::vector<double> sp_vec;
      reuleaux::pointToVector(ws.WsSpheres[i].point, sp_vec);
+     geometry_msgs::Pose reach_pose;
+     int num = 0;
      for(int j=0;j<ws.WsSpheres[i].poses.size();++j)
      {
        moveit_msgs::RobotState state;
-       geometry_msgs::Pose reach_pose= ws.WsSpheres[i].poses[j];
+       reach_pose = ws.WsSpheres[i].poses[j];
        bool is_reachable = getIKSolution(reach_pose, state);
-       if(is_reachable)
-       {
+       if (is_reachable) num++;
+//       if(is_reachable)
+//       {
+//         std::vector<double> sp_pose;
+//         reuleaux::poseToVector(reach_pose, sp_pose);
+//         ws_map.insert(std::make_pair(sp_vec, sp_pose));
+//       }
+     }
+     if(num == 3) // insert only if all three orientations are valid
+     {
+       for (int j = 0; j < 3; j++){
          std::vector<double> sp_pose;
-         reuleaux::poseToVector(reach_pose, sp_pose);
+         reuleaux::poseToVector(ws.WsSpheres[i].poses[j], sp_pose);
          ws_map.insert(std::make_pair(sp_vec, sp_pose));
        }
      }
